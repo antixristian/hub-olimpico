@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model atleta {
+  id                            Int                             @id
+  nome                          String?                         @db.VarChar(255)
+  sexo                          String?                         @db.Char(1)
+  fk_Pais_NOC                   String?                         @db.Char(3)
+  pais                          pais?                           @relation(fields: [fk_Pais_NOC], references: [NOC], onDelete: Restrict, map: "fk_Atleta_Pais")
+  participa_atleta_edicao_prova participa_atleta_edicao_prova[]
+
+  @@index([fk_Pais_NOC], map: "fk_Atleta_Pais")
+}
+
+model edicao {
+  id                            Int                             @id @default(autoincrement())
+  ano                           Int
+  temporada                     String                          @db.VarChar(255)
+  cidade                        String?                         @db.VarChar(255)
+  participa_atleta_edicao_prova participa_atleta_edicao_prova[]
+
+  @@unique([ano, temporada], map: "ano")
+}
+
+model esporte {
+  id   Int     @id @default(autoincrement())
+  nome String? @unique(map: "nome") @db.VarChar(255)
+}
+
+model pais {
+  NOC    String   @id @db.Char(3)
+  nome   String?  @db.VarChar(255)
+  atleta atleta[]
+}
+
+model participa_atleta_edicao_prova {
+  fk_Atleta_id  Int
+  fk_Edicao_id  Int
+  fk_Prova_id   Int
+  idade_atleta  Int?
+  peso_atleta   Decimal? @db.Decimal(5, 1)
+  altura_atleta Decimal? @db.Decimal(5, 1)
+  medalha       String?  @db.VarChar(50)
+  atleta        atleta   @relation(fields: [fk_Atleta_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Participa_Atleta")
+  edicao        edicao   @relation(fields: [fk_Edicao_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Participa_Edicao")
+  prova         prova    @relation(fields: [fk_Prova_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_Participa_Prova")
+
+  @@id([fk_Atleta_id, fk_Edicao_id, fk_Prova_id])
+  @@index([fk_Edicao_id], map: "fk_Participa_Edicao")
+  @@index([fk_Prova_id], map: "fk_Participa_Prova")
+}
+
+model prova {
+  id                            Int                             @id @default(autoincrement())
+  nome                          String                          @unique(map: "nome") @db.VarChar(255)
+  fk_Esporte_id                 Int?
+  participa_atleta_edicao_prova participa_atleta_edicao_prova[]
+}
