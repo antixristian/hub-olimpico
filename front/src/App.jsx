@@ -9,6 +9,8 @@ import { AtletasVeraoInverno } from './components/AtletasVeraoInverno';
 import { MediaIdadeEsportes } from './components/MediaIdadeEsportes';
 import { RecordeEdicao } from './components/RecordeEdicao';
 
+// A URL base da nossa API vinda das variáveis de ambiente
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function App() {
   const [apiData, setApiData] = useState(null);
@@ -19,6 +21,7 @@ function App() {
     setLoading(true);
     setError(null);
     try {
+      // Usando Promise.all para buscar todos os dados em paralelo
       const [
         paisesRes,
         atletasBrasilRes,
@@ -26,11 +29,11 @@ function App() {
         mediaIdadeRes,
         recordeEdicaoRes
       ] = await Promise.all([
-        axios.get('http://localhost:3001/api/paises/top10-medalhas'),
-        axios.get('http://localhost:3001/api/atletas/medalhas-por-atleta-brasil'),
-        axios.get('http://localhost:3001/api/atletas/verao-e-inverno'),
-        axios.get('http://localhost:3001/api/esportes/media-idade'),
-        axios.get('http://localhost:3001/api/atletas/recorde-uma-edicao')
+        axios.get(`${API_BASE_URL}/api/paises/top10-medalhas`),
+        axios.get(`${API_BASE_URL}/api/atletas/medalhas-por-atleta-brasil`),
+        axios.get(`${API_BASE_URL}/api/atletas/verao-e-inverno`),
+        axios.get(`${API_BASE_URL}/api/esportes/media-idade`),
+        axios.get(`${API_BASE_URL}/api/atletas/recorde-uma-edicao`)
       ]);
 
       setApiData({
